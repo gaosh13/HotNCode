@@ -2,11 +2,15 @@
 #include "MenuCursor.h"
 #include "ButtonHandle.h"
 #include "PCBscanner.h"
+#include "Speaker.h"
+#include "game.h"
 
-OLEDPen tft = OLEDPen();
+OLEDPen* tft;
 MenuCursor* menu;
 ButtonHandle* button;
-PCBscanner scanner = PCBscanner();
+Scanner* scanner;
+Speaker* speaker;
+game* g;
 int cover;
 
 // Option 1: use any pins but a little slower
@@ -19,36 +23,54 @@ int cover;
 
 void setup(void) {
   Serial.begin(9600);
-  tft.begin();
-  menu = generateMenu();
+  Serial.println("begin");
+  tft = new OLEDPen();
+  speaker = new Speaker();
+  scanner = new Serialscanner();
+  tft->begin();
   button = new SerialButton();
-  cover = 0;
+  Serial.println("port");
+  menu = generateMenu();
+  g = new game();
+  MMMenu::speaker = speaker;
+  MMMenu::tft = tft;
+  MMMenu::g = g;
+  MMMenu:: scanner = scanner;
+  OLEDPen::cover = 0;
+  Serial.println("menu");
 }
 
 void loop() {
-  tft.drawMenu(menu, cover);
-  cover = 1;
+//  Serial.println("begin drawing");
+  tft->drawMenu(menu);
+//  Serial.println("end drawing");
+  OLEDPen::cover = 1;
+  buttonBlock();
+}
+
+void buttonBlock() {
   for (;;) {
-    if (button->ready()) {
-      int b = button->pressed();
-      bool flag = true;
-      if (b == 0) {
-        tft.drawMenu(menu, 2);
-        menu = menu->back();
-        cover = true;
-      } else if (b == 1) {
-        menu->last();
-      } else if (b == 2) {
-        menu->next();
-      } else if (b == 3) {
-        tft.drawMenu(menu, 2);
-        menu = menu->enter();
-      } else {
-        flag = false;
-      }
-      if (flag) {
-        break;
-      }
+    for (;!button->ready(););
+    
+    int b = button->pressed();
+    bool flag = true;
+    if (b == 0) {
+      tft->drawMenu(menu, 2);
+      menu = menu->back();
+      cover = true;
+    } else if (b == 1) {
+      menu->last();
+    } else if (b == 2) {
+      menu->next();
+    } else if (b == 3) {
+      tft->drawMenu(menu, 2);
+      menu = menu->enter();
+    } else {
+      flag = false;
+    }
+    if (flag) {
+      break;
     }
   }
 }
+

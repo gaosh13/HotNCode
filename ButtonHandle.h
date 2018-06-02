@@ -47,7 +47,7 @@ struct ClickButton : ButtonHandle {
 
   ClickButton() : ButtonHandle() {
     for (int i = 0; i < BUTTONS; ++i) {
-      a[i] = HIGH:
+      a[i] = HIGH;
       pinMode(INPUTPIN[i], INPUT_PULLUP);
     }
     ret = -1;
