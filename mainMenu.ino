@@ -26,9 +26,9 @@ void setup(void) {
   Serial.println("begin");
   tft = new OLEDPen();
   speaker = new Speaker();
-  scanner = new Serialscanner();
+  scanner = new PCBscanner();
   tft->begin();
-  button = new SerialButton();
+  button = new ClickButton();
   Serial.println("port");
   menu = generateMenu();
   g = new game();

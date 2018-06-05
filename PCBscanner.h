@@ -10,12 +10,12 @@ public:
 };
 
 class PCBscanner : public Scanner{
-  static const int PINS = 15;
+  static const int PINS = 12;
   int inputPin(int i) {
-    return i*2 + 22;
+    return i*2 + 25;
   }
   int outputPin(int i) {
-    return i*2 + 23;
+    return i*2 + 24;
   }
 public:
   PCBscanner();

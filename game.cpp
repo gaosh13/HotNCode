@@ -1,4 +1,5 @@
 #include <ArduinoSTL.h>
+#include <Arduino.h>
 
 #include "game.h"
 #include "const.h"
@@ -99,19 +100,23 @@ int isroad(int tile) {
   return tile >= 8;
 }
 
+int codeHome(int a, int b) {
+  return a*100 + b;
+}
+
 int game::checkHome() {
   for (int i = 0; i < H; ++i)
     for (int j = 0; j < W; ++j) {
       if (isanimal(place[i][j][0])) {
         int x = findPoint(i, j);
         if (!point[x])
-          return HOME;
+            return codeHome(HOME, place[i][j][0]);
         if (point[x]->used)
           continue;
         limit l = limit(place[i][j][0]);
         dfs(findPoint(i, j), &l);
         if ((l.state & 1) == 0)
-          return HOME;
+          return codeHome(HOME, place[i][j][0]);
         if ((l.state & 2) != 0)
           return PREDATOR;
       }
@@ -329,6 +334,15 @@ int game::play(const char *pattern) {
       }
     }
   }
+  /*
+  for (int i = 0; i < H; ++i) {
+    for (int j = 0; j < W; ++j) {
+      Serial.print(place[i][j][0]);
+      Serial.print("\t");
+    }
+    Serial.println("");
+  }
+  */
 //  cout << "end decode" << endl;
   return checkResult();
 }

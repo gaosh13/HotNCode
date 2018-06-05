@@ -1,5 +1,6 @@
 #ifndef BUTTONHANDLE_H
 #define BUTTONHANDLE_H
+#include <Arduino.h>
 struct ButtonHandle {
   ButtonHandle() {};
   virtual int ready();
@@ -41,20 +42,20 @@ struct SerialButton : ButtonHandle {
 
 struct ClickButton : ButtonHandle {
   static const int BUTTONS = 4;
-  static const int INPUTPIN[BUTTONS] = {8, 9, 10, 11};
+  static const int PINS[BUTTONS] = {8, 9, 10, 11};
   int a[BUTTONS];
   int ret;
 
   ClickButton() : ButtonHandle() {
     for (int i = 0; i < BUTTONS; ++i) {
       a[i] = HIGH;
-      pinMode(INPUTPIN[i], INPUT_PULLUP);
+      pinMode(PINS[i], INPUT_PULLUP);
     }
     ret = -1;
   }
   int ready() {
     for (int i = 0; i < BUTTONS; ++i) {
-      int b = digitalRead(INPUTPIN[i]);
+      int b = digitalRead(PINS[i]);
       if (b != a[i]) {
         a[i] = b;
         if (b == LOW) {
@@ -76,4 +77,7 @@ struct ClickButton : ButtonHandle {
     }
   }
 };
+
+const int ClickButton::BUTTONS;
+const int ClickButton::PINS[ClickButton::BUTTONS];
 #endif

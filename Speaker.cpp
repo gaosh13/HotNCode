@@ -5,6 +5,13 @@ Speaker::Speaker() {
   if (!sfx.reset()) {}
 }
 
+int Speaker::play(int a) {
+  if (! sfx.playTrack(a) ) {
+    return -1;
+  }
+  return 0;
+}
+
 int Speaker::operate(std::string cmds) {
   switch (cmds[0]) {
     case 'r': {

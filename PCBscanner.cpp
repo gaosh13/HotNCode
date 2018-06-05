@@ -7,48 +7,62 @@ Scanner::Scanner() {
 }
 
 PCBscanner::PCBscanner() : Scanner() {
-	for (int i = 0; i < PINS; ++i) {
-		pinMode(inputPin(i), INPUT);
-		pinMode(outputPin(i), OUTPUT);
-	}
+  for (int i = 0; i < PINS; ++i) {
+    pinMode(inputPin(i), INPUT);
+    pinMode(outputPin(i), OUTPUT);
+  }
 }
 
 std::string PCBscanner::scan() {
-	std::string pattern = "";
-	for (int i = 0; i < PINS; ++i) {
-		for (int j = 0; j < PINS; ++j) {
-			digitalWrite(j, i == j ? LOW : HIGH);
-		}
-		delay(10);
-		for (int j = 0; j < PINS; ++j) {
-			int a = digitalRead(j);
-			char c = a == HIGH ? '0' : '1';
-			pattern += c;
-		}
-	}
-	return pattern;
+  std::string pattern = "";
+  char rcd[PINS][PINS];
+  for (int i = 0; i < PINS; ++i) {
+    for (int j = 0; j < PINS; ++j) {
+      digitalWrite(outputPin(j), i == j ? LOW : HIGH);
+    }
+    delay(10);
+    for (int j = 0; j < PINS; ++j) {
+      int a = digitalRead(inputPin(j));
+      char c = a == HIGH ? '0' : '1';
+//      pattern += c;
+      rcd[i][j] = c;
+    }
+  }
+  int count = 0;
+  for (int i = 0; i < PINS; ++i) {
+    if (i%3 == 0) Serial.println("");
+    for (int j = 0; j < PINS; ++j) {
+      if (j%3 == 0) Serial.print(" ");
+      Serial.print(rcd[j][i]);
+      if (rcd[j][i] == '1') count ++;
+      pattern += rcd[j][i];
+    }
+    Serial.println("");
+  }
+  Serial.println(count);
+  return pattern;
 }
 
 int getint() {
-	int num = 0;
-	char c = ' ';
-	for (;;) {
-		if (Serial.available()) {
-			c = Serial.read();
-			if (isDigit(c)) break;
-		}
-	}
-	for (;;) {
-		num = num * 10 + c - '0';
-		for (;;) {
-			if (Serial.available()) {
-				c = Serial.read();
-				break;
-			}
-		}
-		if (!isDigit(c)) break;
-	}
-	return num;
+  int num = 0;
+  char c = ' ';
+  for (;;) {
+    if (Serial.available()) {
+      c = Serial.read();
+      if (isDigit(c)) break;
+    }
+  }
+  for (;;) {
+    num = num * 10 + c - '0';
+    for (;;) {
+      if (Serial.available()) {
+        c = Serial.read();
+        break;
+      }
+    }
+    if (!isDigit(c)) break;
+  }
+  return num;
 }
 
 void toCharArray(char *tmp, int a) {
@@ -87,10 +101,10 @@ Serialscanner::Serialscanner() : Scanner() {
 }
 
 std::string Serialscanner::scan() {
-	int num[Ntile], dir[Ntile];
-	for (int i = 0; i < Ntile; ++i) {
-		num[i] = getint();
-		dir[i] = getint();
-	}
-	return genpattern(num, dir);
+  int num[Ntile], dir[Ntile];
+  for (int i = 0; i < Ntile; ++i) {
+    num[i] = getint();
+    dir[i] = getint();
+  }
+  return genpattern(num, dir);
 }
